@@ -7,18 +7,58 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ciclospa.ui.theme.CicloSpaTheme
+import com.example.ciclospa.viewmodels.MainViewModel
+import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.ciclospa.navigation.NavigationEvent
+import com.example.ciclospa.navigation.Screen
+import com.example.ciclospa.ui.RegisterScreen
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
+
         setContent {
-            CicloSpaTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    HomeScreen()
+            val mainViewModel: MainViewModel = viewModel()
+            val navController = rememberNavController()
+
+            LaunchedEffect(Unit) {
+                mainViewModel.navigationEvents.collect { event ->
+                    when (event) {
+                        is NavigationEvent.NavigateTo -> {
+                            navController.navigate(event.route.route)
+                        }
+
+                        NavigationEvent.PopBackStack -> {
+                            navController.popBackStack()
+                        }
+                    }
                 }
             }
-        }
-    }
-}
+
+            CicloSpaTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = Screen.Home.route
+                    ) {
+                        composable(Screen.Home.route) {
+                            HomeScreen(viewModel = mainViewModel)
+                        }
+
+                        composable(Screen.Register.route) {
+                            RegisterScreen()
+                        }
+                    }
+                }
+            }
+        }}}

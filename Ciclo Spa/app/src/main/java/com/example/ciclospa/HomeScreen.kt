@@ -3,6 +3,7 @@ package com.example.ciclospa
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,65 +21,83 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ciclospa.navigation.Screen
+import com.example.ciclospa.viewmodels.MainViewModel
 
 @Composable
-fun HomeScreen() {
 
-    // La Column principal
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center // Esto centra todo el bloque verticalmente
+fun HomeScreen(viewModel: MainViewModel) {
+
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
 
-        // 1) Logo de la app EVA
+        // Imagen de fondo
         Image(
-            painter = painterResource(id = R.drawable.logo_eva),
-            contentDescription = "Logo EVA myCiclo",
+            painter = painterResource(R.drawable.images),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        // La Column principal
+        Column(
             modifier = Modifier
-                .size(130.dp) // Tamaño del logo
-                .padding(bottom = 24.dp), // Espacio entre el logo y el título
-            contentScale = ContentScale.Fit
-        )
-
-        // 2) Título
-        Text(
-            text = "¡Bienvenido a Ciclo Spa!",
-            fontSize = 26.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 24.dp) // Espacio entre título y descripción
-        )
-
-        // 3) Descripción
-        Text(
-            text = "Tu bitácora digital privada y segura para el seguimiento de tu ciclo y bienestar diario mediante el dispositivo EVA.",
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 40.dp) // Espacio entre descripción y botones
-        )
-
-        // 4) Botón Registrar
-        Button(
-            onClick = { /* Accion de Registrar */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "Registrar", fontSize = 16.sp)
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            // 1) Logo de la app EVA
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo EVA myCiclo",
+                modifier = Modifier
+                    .size(130.dp) // Tamaño del logo
+                    .padding(bottom = 24.dp), // Espacio entre el logo y el título
+                contentScale = ContentScale.Fit
+            )
 
-        // 5) Botón Ya tengo Cuenta
-        OutlinedButton(
-            onClick = { /* Accion Ya tengo Cuenta */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-        ) {
-            Text(text = "Ya tengo Cuenta", fontSize = 16.sp)
+            // 2) Título
+            Text(
+                text = "¡Bienvenido a Ciclo Spa!",
+                fontSize = 30.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 24.dp) // Espacio entre título y descripción
+            )
+
+            // 3) Descripción
+            Text(
+                text = "Tu bitácora digital privada y segura para el seguimiento de tu ciclo y bienestar diario mediante el dispositivo EVA.",
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 40.dp) // Espacio entre descripción y botones
+            )
+
+            // 4) Botón Registrar
+            Button(
+                onClick = {
+                    viewModel.navigateTo(Screen.Register)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text(text = "Registrar", fontSize = 18.sp)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 5) Botón Ya tengo Cuenta
+            OutlinedButton(
+                onClick = { /* Accion Ya tengo Cuenta */ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text(text = "Ya tengo Cuenta", fontSize = 18.sp)
+            }
         }
     }
 }
