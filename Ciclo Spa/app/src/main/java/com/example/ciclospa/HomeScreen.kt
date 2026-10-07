@@ -64,7 +64,7 @@ fun HomeScreen(viewModel: MainViewModel) {
                 text = "¡Bienvenido a Ciclo Spa!",
                 fontSize = 30.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 24.dp) // Espacio entre título y descripción
+                modifier = Modifier.padding(bottom = 24.dp)
             )
 
             // 3) Descripción
@@ -72,7 +72,7 @@ fun HomeScreen(viewModel: MainViewModel) {
                 text = "Tu bitácora digital privada y segura para el seguimiento de tu ciclo y bienestar diario mediante el dispositivo EVA.",
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 40.dp) // Espacio entre descripción y botones
+                modifier = Modifier.padding(bottom = 40.dp)
             )
 
             // 4) Botón Registrar
