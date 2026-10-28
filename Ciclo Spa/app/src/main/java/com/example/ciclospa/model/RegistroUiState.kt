@@ -1,14 +1,10 @@
-
 package com.example.ciclospa.model
 
 data class RegistroUiState(
     val nombre: String = "",
     val correo: String = "",
     val aceptaTerminos: Boolean = false,
-    val errores: RegistroErrores = RegistroErrores(),
-    val fotoUri: String = "",
-    val guardando: Boolean = false,
-    val guardado: Boolean = false
+    val errores: RegistroErrores = RegistroErrores()
 )
 
 data class RegistroErrores(

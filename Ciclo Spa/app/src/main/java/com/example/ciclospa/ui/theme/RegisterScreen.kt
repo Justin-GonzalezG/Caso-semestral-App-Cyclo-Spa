@@ -1,23 +1,32 @@
 
 package com.example.ciclospa.ui.theme
 
-import android.graphics.BitmapFactory
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ciclospa.viewmodels.RegistroViewModel
@@ -29,71 +38,37 @@ fun RegisterScreen(
     onRegistroExitoso: (String) -> Unit
 ) {
     val estado by registroViewModel.estado.collectAsState()
-    val contexto = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val snackbar = remember { SnackbarHostState() }
-
-    var fotoBitmap by remember {
-        mutableStateOf<android.graphics.Bitmap?>(null)
-    }
-
-    val camara = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { exito ->
-        if (exito && estado.fotoUri.isNotBlank()) {
-            try {
-                contexto.contentResolver.openInputStream(
-                    android.net.Uri.parse(estado.fotoUri)
-                )?.use { entrada ->
-                    fotoBitmap = BitmapFactory.decodeStream(entrada)
-                }
-            } catch (_: Exception) {
-                fotoBitmap = null
-            }
-        }
-    }
-
-    val colorBoton by animateColorAsState(
-        targetValue = when {
-            estado.guardando -> Color.Gray
-            estado.guardado -> Color(0xFF2E7D32)
-            else -> MaterialTheme.colorScheme.primary
-        },
-        label = "colorBoton"
-    )
-
-    val espacioLogo by animateDpAsState(
-        targetValue = if (estado.guardado) 8.dp else 24.dp,
-        label = "espacioLogo"
-    )
-
-    LaunchedEffect(estado.guardado) {
-        if (estado.guardado) {
-            snackbar.showSnackbar("Datos guardados correctamente")
-        }
-    }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbar) }
-    ) { padding ->
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
+    ) { paddingValues ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
             Text(
                 text = "Crear cuenta",
                 style = MaterialTheme.typography.headlineMedium
             )
 
-            Spacer(Modifier.height(espacioLogo))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Text("Bienvenida a Ciclo Spa. Registra tus datos.")
+            Text(
+                text = "Bienvenida a Ciclo Spa. Registra tus datos para comenzar.",
+                style = MaterialTheme.typography.bodyMedium
+            )
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
                 value = estado.nombre,
@@ -102,12 +77,14 @@ fun RegisterScreen(
                 singleLine = true,
                 isError = estado.errores.nombre != null,
                 supportingText = {
-                    estado.errores.nombre?.let { Text(it) }
+                    estado.errores.nombre?.let { mensaje ->
+                        Text(mensaje)
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = estado.correo,
@@ -116,128 +93,90 @@ fun RegisterScreen(
                 singleLine = true,
                 isError = estado.errores.correo != null,
                 supportingText = {
-                    estado.errores.correo?.let { Text(it) }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Checkbox(
-                    checked = estado.aceptaTerminos,
-                    onCheckedChange =
-                        registroViewModel::onAceptarTerminosChange
-                )
-                Text("Acepto los términos y condiciones")
-            }
-
-            estado.errores.aceptaTerminos?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-
-            OutlinedButton(
-                onClick = {
-                    try {
-                        val uri = registroViewModel.crearFoto()
-                        registroViewModel.onFotoTomada(uri.toString())
-                        camara.launch(uri)
-                    } catch (e: Exception) {
-                        scope.launch {
-                            snackbar.showSnackbar(
-                                "Error al abrir la cámara: ${e.message}"
-                            )
-                        }
+                    estado.errores.correo?.let { mensaje ->
+                        Text(mensaje)
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Tomar fotografía")
-            }
+            )
 
-            fotoBitmap?.let { bitmap ->
-                Spacer(Modifier.height(12.dp))
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = "Fotografía del registro",
-                    modifier = Modifier.size(140.dp)
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = estado.aceptaTerminos,
+                    onCheckedChange = registroViewModel::onAceptarTerminosChange
+                )
+
+                Text(
+                    text = "Acepto los términos y condiciones",
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
-            Spacer(Modifier.height(16.dp))
+            estado.errores.aceptaTerminos?.let { mensaje ->
+                Text(
+                    text = mensaje,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 12.dp)
+                )
+            }
 
-            Text("Vista previa", style = MaterialTheme.typography.titleMedium)
-            Text("Nombre: ${estado.nombre.ifBlank { "Sin ingresar" }}")
-            Text("Correo: ${estado.correo.ifBlank { "Sin ingresar" }}")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            HorizontalDivider()
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
-                "Términos aceptados: ${
-                    if (estado.aceptaTerminos) "Sí" else "No"
-                }"
+                text = "Vista previa",
+                style = MaterialTheme.typography.titleMedium
             )
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Nombre: ${estado.nombre.ifBlank { "Sin ingresar" }}",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Text(
+                text = "Correo: ${estado.correo.ifBlank { "Sin ingresar" }}",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Text(
+                text = "Términos aceptados: ${
+                    if (estado.aceptaTerminos) "Sí" else "No"
+                }",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
                     if (registroViewModel.validar()) {
-                        registroViewModel.guardar()
+                        onRegistroExitoso(estado.nombre.trim())
                     } else {
                         scope.launch {
-                            snackbar.showSnackbar(
+                            snackbarHostState.showSnackbar(
                                 "Revisa los campos del formulario"
                             )
                         }
                     }
                 },
-                enabled = !estado.guardando,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorBoton
-                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
             ) {
-                if (estado.guardando) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(22.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text("Guardando...")
-                } else {
-                    Text(
-                        if (estado.guardado) "Datos guardados"
-                        else "Guardar registro"
-                    )
-                }
-            }
-
-            AnimatedVisibility(visible = estado.guardado) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(Modifier.height(12.dp))
-                    Text(
-                        "Datos guardados en el teléfono",
-                        color = Color(0xFF2E7D32)
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Button(
-                        onClick = {
-                            onRegistroExitoso(estado.nombre.trim())
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Continuar")
-                    }
-                }
+                Text("Enviar registro")
             }
         }
     }

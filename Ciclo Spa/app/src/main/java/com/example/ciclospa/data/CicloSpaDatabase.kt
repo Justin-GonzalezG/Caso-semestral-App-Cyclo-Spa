@@ -4,15 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.ciclospa.model.RegistroBitacora
 
 @Database(
-    entities = [Usuario::class],
-    version = 1,
+    entities = [Usuario::class, RegistroBitacora::class],
+    version = 2,
     exportSchema = false
 )
 abstract class CicloSpaDatabase : RoomDatabase() {
 
     abstract fun usuarioDao(): UsuarioDao
+    abstract fun bitacoraDao(): BitacoraDao
 
     companion object {
         @Volatile
@@ -24,9 +26,11 @@ abstract class CicloSpaDatabase : RoomDatabase() {
                     context.applicationContext,
                     CicloSpaDatabase::class.java,
                     "ciclo_spa_db"
-                ).build().also {
-                    INSTANCE = it
-                }
+                )
+                    .fallbackToDestructiveMigration()
+                    .build().also {
+                        INSTANCE = it
+                    }
             }
         }
     }
