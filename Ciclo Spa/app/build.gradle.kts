@@ -46,6 +46,8 @@ dependencies {
 
     // Android y Jetpack Compose
     implementation(libs.androidx.activity.compose)
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0")
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)

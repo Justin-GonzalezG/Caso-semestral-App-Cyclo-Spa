@@ -1,3 +1,4 @@
+
 package com.example.ciclospa
 
 import android.os.Bundle
@@ -22,6 +23,7 @@ import com.example.ciclospa.ui.theme.CicloSpaTheme
 import com.example.ciclospa.ui.theme.DashboardScreen
 import com.example.ciclospa.ui.theme.RegisterScreen
 import com.example.ciclospa.viewmodels.MainViewModel
+import com.example.ciclospa.viewmodels.RegistroViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -31,7 +33,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CicloSpaTheme {
+
                 val mainViewModel: MainViewModel = viewModel()
+                val registroViewModel: RegistroViewModel = viewModel()
                 val navController = rememberNavController()
 
                 var nombreRegistrado by remember {
@@ -59,12 +63,16 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Screen.Home.route
                     ) {
+
                         composable(Screen.Home.route) {
-                            HomeScreen(viewModel = mainViewModel)
+                            HomeScreen(
+                                viewModel = mainViewModel
+                            )
                         }
 
                         composable(Screen.Register.route) {
                             RegisterScreen(
+                                registroViewModel = registroViewModel,
                                 onRegistroExitoso = { nombre ->
                                     nombreRegistrado = nombre
 
@@ -72,6 +80,7 @@ class MainActivity : ComponentActivity() {
                                         popUpTo(Screen.Register.route) {
                                             inclusive = true
                                         }
+                                        launchSingleTop = true
                                     }
                                 }
                             )
@@ -87,8 +96,10 @@ class MainActivity : ComponentActivity() {
                                         popUpTo("dashboard") {
                                             inclusive = true
                                         }
+                                        launchSingleTop = true
                                     }
-                                }
+                                },
+                                registroViewModel = registroViewModel
                             )
                         }
                     }
