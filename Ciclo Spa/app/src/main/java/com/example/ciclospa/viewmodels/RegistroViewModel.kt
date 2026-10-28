@@ -101,6 +101,25 @@ class RegistroViewModel(application: Application) :
             )
         }
     }
+    fun validarInicioSesion(
+        identificador: String,
+        resultado: (Boolean, String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val existe = preferencias.validarUsuario(identificador)
+
+                if (existe) {
+                    val (nombre, _) = preferencias.leer()
+                    resultado(true, nombre)
+                } else {
+                    resultado(false, "")
+                }
+            } catch (e: Exception) {
+                resultado(false, "")
+            }
+        }
+    }
 
     fun onCorreoChange(valor: String) {
         _estado.update {

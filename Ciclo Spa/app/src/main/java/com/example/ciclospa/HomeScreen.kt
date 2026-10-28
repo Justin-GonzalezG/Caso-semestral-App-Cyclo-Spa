@@ -89,9 +89,10 @@ fun HomeScreen(viewModel: MainViewModel) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 5) Botón Ya tengo Cuenta
             OutlinedButton(
-                onClick = { /* Accion Ya tengo Cuenta */ },
+                onClick = {
+                    viewModel.navigateTo(Screen.Login)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)

@@ -22,6 +22,12 @@ class RegistroPreferences(private val context: Context) {
             preferencias[claveCorreo] = correo
         }
     }
+    suspend fun validarUsuario(identificador: String): Boolean {
+        val (nombre, correo) = leer()
+
+        return identificador.trim().equals(nombre.trim(), ignoreCase = true) ||
+                identificador.trim().equals(correo.trim(), ignoreCase = true)
+    }
 
     suspend fun leer(): Pair<String, String> {
         val preferencias = context.registroDataStore.data.first()

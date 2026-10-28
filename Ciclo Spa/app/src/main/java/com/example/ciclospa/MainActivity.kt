@@ -21,6 +21,7 @@ import com.example.ciclospa.navigation.NavigationEvent
 import com.example.ciclospa.navigation.Screen
 import com.example.ciclospa.ui.theme.CicloSpaTheme
 import com.example.ciclospa.ui.theme.DashboardScreen
+import com.example.ciclospa.ui.theme.LoginScreen
 import com.example.ciclospa.ui.theme.RegisterScreen
 import com.example.ciclospa.viewmodels.MainViewModel
 import com.example.ciclospa.viewmodels.RegistroViewModel
@@ -33,7 +34,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CicloSpaTheme {
-
                 val mainViewModel: MainViewModel = viewModel()
                 val registroViewModel: RegistroViewModel = viewModel()
                 val navController = rememberNavController()
@@ -63,7 +63,6 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Screen.Home.route
                     ) {
-
                         composable(Screen.Home.route) {
                             HomeScreen(
                                 viewModel = mainViewModel
@@ -86,25 +85,32 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("dashboard") {
-                            DashboardScreen(
-                                nombre = nombreRegistrado,
-                                onCerrarSesion = {
-                                    nombreRegistrado = ""
 
-                                    navController.navigate(Screen.Home.route) {
-                                        popUpTo("dashboard") {
-                                            inclusive = true
+                        composable(Screen.Login.route) {
+                            LoginScreen(
+                                onIniciarSesion = { identificador, responder ->
+                                    registroViewModel.validarInicioSesion(identificador) { valido, nombre ->
+                                        if (valido) {
+                                            nombreRegistrado = nombre
+
+                                            navController.navigate("dashboard") {
+                                                popUpTo(Screen.Login.route) {
+                                                    inclusive = true
+                                                }
+                                                launchSingleTop = true
+                                            }
+
+                                            responder(true, "")
+                                        } else {
+                                            responder(
+                                                false,
+                                                "Nombre o correo incorrecto. No tienes una cuenta registrada."
+                                            )
                                         }
-                                        launchSingleTop = true
                                     }
                                 },
-                                registroViewModel = registroViewModel
+                                onVolver = {
+                                    navController.popBackStack()
+                                }
                             )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+                        }}}}}}}
